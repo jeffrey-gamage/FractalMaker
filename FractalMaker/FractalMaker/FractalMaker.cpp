@@ -3,10 +3,13 @@
 
 #include "pch.h"
 #include <iostream>
+#include "Bitmap.h"
 
 int main()
 {
-    std::cout << "Hello World!\n"; 
+	Bitmap bitmap(800, 600);
+	bitmap.write("test.bmp");
+    std::cout << "Finished!\n"; 
 }
 
 // Run program: Ctrl + F5 or Debug > Start Without Debugging menu

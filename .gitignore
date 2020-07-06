@@ -2,3 +2,6 @@ FractalMaker/.vs/
 FractalMaker/FractalMaker/FractalMaker.vcxproj.filters
 FractalMaker/FractalMaker/FractalMaker.vcxproj
 FractalMaker/FractalMaker/FractalMaker.vcxproj.user
+*.bmp
+FractalMaker/Debug/
+FractalMaker/FractalMaker/Debug/
