@@ -3,22 +3,67 @@
 
 #include "pch.h"
 #include <iostream>
+#include <cstdint>
+#include <thread>
+#include <memory>
+#include "Mandelbrot.h"
 #include "Bitmap.h"
+#include "FractalMaker.h"
+
+
 
 int main()
 {
-	Bitmap bitmap(800, 600);
-	bitmap.write("test.bmp");
+
+	const int WIDTH = 800;
+	const int HEIGHT = 600;
+
+	Bitmap bitmap(WIDTH, HEIGHT);
+	std::unique_ptr<int[]> iterationHistogram(new int[Mandelbrot::MAX_ITERATIONS]{});
+	std::unique_ptr<int[]> iterationMap(new int[WIDTH*HEIGHT]{});
+
+	for (int y = 0; y < HEIGHT; y ++)
+	{
+		std::cout << "calculating row " << y << std::endl;
+		for (int x = 0; x < WIDTH; x++)
+		{
+			double xfractal = (x - WIDTH * 2 / 3) *2.0 / HEIGHT;
+			double yfractal = (y - HEIGHT / 2)*2.0 / HEIGHT;
+
+			int iterations = Mandelbrot::GetIterations(xfractal, yfractal);
+			iterationMap[y*WIDTH + x] = iterations;
+			if (iterations < Mandelbrot::MAX_ITERATIONS)
+			{
+				iterationHistogram[iterations]++;
+			}
+		}
+	}
+
+	int histogramSum = 0;
+	for (int i = 0; i < Mandelbrot::MAX_ITERATIONS; i++)
+	{
+		histogramSum += iterationHistogram[i];
+	}
+	for (int y = 0; y < HEIGHT; y++)
+	{
+		std::cout << "painting row "<< y << std::endl;
+		for (int x = 0; x < WIDTH; x++)
+		{
+			double hue = 0.0;
+			int iterations = iterationMap[y*WIDTH + x];
+			if (iterations < Mandelbrot::MAX_ITERATIONS)
+			{
+				for (int i = 0; i < iterations; i++)
+				{
+					hue += ((double)iterationHistogram[i]) / histogramSum;
+				}
+				bitmap.setPixel(x, y, (uint8_t) std::pow(255,hue), (uint8_t) std::pow(100,hue), (uint8_t) std::pow(255,hue));
+			}
+		}
+	}
+
+	bitmap.write("mandelbrot.bmp");
     std::cout << "Finished!\n"; 
+	return 0;
 }
 
-// Run program: Ctrl + F5 or Debug > Start Without Debugging menu
-// Debug program: F5 or Debug > Start Debugging menu
-
-// Tips for Getting Started: 
-//   1. Use the Solution Explorer window to add/manage files
-//   2. Use the Team Explorer window to connect to source control
-//   3. Use the Output window to see build output and other messages
-//   4. Use the Error List window to view errors
-//   5. Go to Project > Add New Item to create new code files, or Project > Add Existing Item to add existing code files to the project
-//   6. In the future, to open this project again, go to File > Open > Project and select the .sln file

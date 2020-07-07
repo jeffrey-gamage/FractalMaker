@@ -4,18 +4,13 @@
 #include "bitmapInfoHeader.h"
 #include <fstream>
 
+using namespace std;
 
-Bitmap::Bitmap(int width, int height) : m_width(width), m_height(height), m_pixels(new std::uint8_t[width*height * 3]{})
-{
+Bitmap::Bitmap(int width, int height) :
+	m_width(width), m_height(height), m_pixels(
+		new uint8_t[width * height * 3]{ }) {
 
 }
-
-
-void Bitmap::setPixel(int x, int y, std::uint8_t r, std::uint8_t g, std::uint8_t b)
-{
-	//TODO
-}
-
 bool Bitmap::write(std::string filename)
 {
 	BitmapHeader fileheader;
@@ -27,7 +22,7 @@ bool Bitmap::write(std::string filename)
 	bmpInfoHeader.width = m_width;
 
 	std::ofstream file;
-	file.open(filename);
+	file.open(filename,ios::binary);
 	if (file.is_open())
 	{
 		file.write((char*)&fileheader,sizeof(fileheader));
@@ -38,6 +33,16 @@ bool Bitmap::write(std::string filename)
 	}
 	return false;
 }
+
+void Bitmap::setPixel(int x, int y, uint8_t r, uint8_t g, uint8_t b)
+{
+	uint8_t* pixel = m_pixels.get();
+	pixel += (m_width*y * 3) + x * 3;
+	pixel[0] = b;
+	pixel[1] = g;
+	pixel[2] = r;
+}
+
 
 Bitmap::~Bitmap()
 {
