@@ -6,7 +6,10 @@
 #include <cstdint>
 #include <thread>
 #include <memory>
+#include <utility>
 #include "Mandelbrot.h"
+#include "ZoomList.h"
+#include "Zoom.h"
 #include "Bitmap.h"
 #include "FractalMaker.h"
 
@@ -18,6 +21,10 @@ int main()
 	const int WIDTH = 800;
 	const int HEIGHT = 600;
 
+	ZoomList zoomlist(WIDTH, HEIGHT);
+	zoomlist.add(Zoom(WIDTH / 2, HEIGHT / 2, 4.0 / WIDTH));
+	zoomlist.add(Zoom(369, HEIGHT - 93, 0.1));
+
 	Bitmap bitmap(WIDTH, HEIGHT);
 	std::unique_ptr<int[]> iterationHistogram(new int[Mandelbrot::MAX_ITERATIONS]{});
 	std::unique_ptr<int[]> iterationMap(new int[WIDTH*HEIGHT]{});
@@ -27,10 +34,8 @@ int main()
 		std::cout << "calculating row " << y << std::endl;
 		for (int x = 0; x < WIDTH; x++)
 		{
-			double xfractal = (x - WIDTH * 2 / 3) *2.0 / HEIGHT;
-			double yfractal = (y - HEIGHT / 2)*2.0 / HEIGHT;
-
-			int iterations = Mandelbrot::GetIterations(xfractal, yfractal);
+			std::pair<double,double> fractalCoords = zoomlist.doZoom(x, y);
+			int iterations = Mandelbrot::GetIterations(fractalCoords.first, fractalCoords.second);
 			iterationMap[y*WIDTH + x] = iterations;
 			if (iterations < Mandelbrot::MAX_ITERATIONS)
 			{
