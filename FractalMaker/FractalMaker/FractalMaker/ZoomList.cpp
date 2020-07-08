@@ -2,7 +2,7 @@
 #include "ZoomList.h"
 
 
-ZoomList::ZoomList(int width, int height): m_width(width), m_height(height)
+ZoomList::ZoomList(int width, int height): m_width(width), m_height(height),m_xcenter(0),m_ycenter(0)
 {
 }
 

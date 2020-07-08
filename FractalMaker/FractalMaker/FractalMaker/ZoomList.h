@@ -14,8 +14,8 @@ public:
 private:
 	int m_width{ 0 };
 	int m_height{ 0 };
-	int m_xcenter;
-	int m_ycenter;
+	double m_xcenter{ 0 };
+	double m_ycenter{ 0 };
 	double m_scale{ 1.0 };
 	std::vector<Zoom> zooms;
 
