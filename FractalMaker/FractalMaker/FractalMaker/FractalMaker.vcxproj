@@ -26,6 +26,7 @@
     <ClCompile Include="FractalMaker.cpp" />
     <ClCompile Include="Mandelbrot.cpp" />
     <ClCompile Include="pch.cpp" />
+    <ClCompile Include="RGBColor.cpp" />
     <ClCompile Include="Zoom.cpp" />
     <ClCompile Include="ZoomList.cpp" />
   </ItemGroup>
@@ -36,6 +37,7 @@
     <ClInclude Include="FractalCreator.h" />
     <ClInclude Include="Mandelbrot.h" />
     <ClInclude Include="pch.h" />
+    <ClInclude Include="RGBColor.h" />
     <ClInclude Include="Zoom.h" />
     <ClInclude Include="ZoomList.h" />
   </ItemGroup>

@@ -13,6 +13,7 @@
 #include "Zoom.h"
 #include "Bitmap.h"
 #include "FractalCreator.h"
+#include "RGBColor.h"
 
 
 
@@ -21,15 +22,11 @@ int main()
 
 	const int WIDTH = 800;
 	const int HEIGHT = 600;
-
-	FractalCreator fractalCreator(WIDTH,HEIGHT);
-	fractalCreator.addZoom(Zoom(WIDTH / 2, HEIGHT / 2, 4.0 / WIDTH));
-	fractalCreator.addZoom(Zoom(292, HEIGHT - 175, 0.1));
-	fractalCreator.addZoom(Zoom(514, HEIGHT - 299, 0.1));
-	fractalCreator.calculateIteration();
-	fractalCreator.drawFractal();
-	fractalCreator.writeBitmap("mandelbrot2.bmp");
-    std::cout << "Finished!\n"; 
+	FractalCreator fractalCreator(WIDTH, HEIGHT);
+	fractalCreator.addZoom(292, 175, 0.1);
+	fractalCreator.addZoom(514, 299, 0.1);
+	fractalCreator.addColorRange(0.35, RGBColor(255, 100, 255));
+	fractalCreator.run("mandelbrot.bmp");
 	return 0;
 }
 
