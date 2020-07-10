@@ -22,6 +22,7 @@ void FractalCreator::run(std::string filename)
 {
 	sanitizeColorInputs();
 	calculateIteration();
+	calculateColorRangePixelCounts();
 	drawFractal();
 	writeBitmap(filename);
 	std::cout << "Finished!\n";
@@ -47,36 +48,30 @@ void FractalCreator::calculateIteration()
 
 void FractalCreator::drawFractal()
 {
-	int histogramSum = 0;
-	for (int i = 0; i < Mandelbrot::MAX_ITERATIONS; i++)
-	{
-		histogramSum += m_iterationHistogram[i];
-	}
 	for (int y = 0; y < m_height; y++)
 	{
+		std::cout << "drawing row " << y << std::endl;
 		for (int x = 0; x < m_width; x++)
 		{
-			double hue = 0.0;
 			int iterations = m_iterationMap[y * m_width+ x];
+			int color_range_index = getRangeIndex(iterations);
+			int range_pixel_count = m_colorRangePixelCounts[color_range_index];
+			int range_start = getRangeMinimumIterations(color_range_index);
+
+			RGBColor startColor = m_colors[color_range_index];
+			RGBColor endColor = m_colors[color_range_index + 1];
+			RGBColor colorDiff = endColor - startColor;
 			if (iterations < Mandelbrot::MAX_ITERATIONS)
 			{
-				for (int i = 0; i < iterations; i++)
+				int totalPixels = 0;
+				for (int i =range_start; i < iterations; i++)
 				{
-					hue += ((double)m_iterationHistogram[i]) / histogramSum;
+					totalPixels += m_iterationHistogram[i];
 				}
-				int colourIndex = 0;
-				double rangeSum = m_colorRangeIntervals[colourIndex];
-				while (rangeSum < hue)
-				{
-					colourIndex++;
-					rangeSum += m_colorRangeIntervals[colourIndex];
-				}
-				m_colorRangePixelCounts[colourIndex]++;
-				RGBColor startColor = m_colors[colourIndex];
-				RGBColor endColor = m_colors[colourIndex + 1];
-				RGBColor colorDiff = endColor - startColor;
-				hue -= rangeSum - m_colorRangeIntervals[colourIndex];
-				m_bitmap.setPixel(x, y, startColor.r+colorDiff.r*hue, startColor.g+colorDiff.g*hue, startColor.b+colorDiff.b*hue);
+				uint8_t r = startColor.r + colorDiff.r * (double)totalPixels / range_pixel_count;
+				uint8_t g = startColor.g + colorDiff.g * (double)totalPixels / range_pixel_count;
+				uint8_t b = startColor.b + colorDiff.b * (double)totalPixels / range_pixel_count;
+				m_bitmap.setPixel(x, y, r, g, b);
 			}
 		}
 	}
@@ -101,11 +96,17 @@ void FractalCreator::writeBitmap(std::string name)
 	m_bitmap.write(name);
 }
 
-void FractalCreator::printColorRangePixelCounts()
+void FractalCreator::calculateColorRangePixelCounts()
 {
-	for (int pixelCount : m_colorRangePixelCounts)
+	int range_index = 0;
+	for (int i = 0; i < Mandelbrot::MAX_ITERATIONS; i++)
 	{
-		std::cout << pixelCount << std::endl;
+		int num_pixels = m_iterationHistogram[i];
+		if (i > getRangeMaximumIterations(range_index))
+		{
+			range_index++;
+		}
+		m_colorRangePixelCounts[range_index] += num_pixels;
 	}
 }
 
@@ -136,4 +137,38 @@ void FractalCreator::enforceColorGradient()
 	{
 		addColorRange(1.0, RGBColor(255, 255, 255));
 	}
+}
+
+//returns the hightest pixel count included in the indexed range
+int FractalCreator::getRangeMaximumIterations(int rangeIndex) const
+{
+	float rangeMaximumFraction = 0.0;
+	for (int i = 0; i <= rangeIndex; i++)
+	{
+		rangeMaximumFraction += m_colorRangeIntervals[i];
+	}
+	return rangeMaximumFraction * Mandelbrot::MAX_ITERATIONS;
+}
+int FractalCreator::getRangeMinimumIterations(int rangeIndex) const
+{
+	if (rangeIndex == 0)
+	{
+		return 0;
+	}
+	else
+	{
+		return getRangeMaximumIterations(rangeIndex - 1) + 1;
+	}
+}
+//returns the color range into which the passed number of iterations falls
+int FractalCreator::getRangeIndex(int iterations) const
+{
+	for (int i = 0; i < m_colorRangeIntervals.size(); i++)
+	{
+		if (getRangeMaximumIterations(i) >= iterations)
+		{
+			return i;
+		}
+	}
+	return m_colorRangeIntervals.size() - 1;
 }

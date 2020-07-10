@@ -23,7 +23,7 @@
     <ClCompile Include="bitmapHeader.cpp" />
     <ClCompile Include="bitmapInfoHeader.cpp" />
     <ClCompile Include="FractalCreator.cpp" />
-    <ClCompile Include="FractalMaker.cpp" />
+    <ClCompile Include="main.cpp" />
     <ClCompile Include="Mandelbrot.cpp" />
     <ClCompile Include="pch.cpp" />
     <ClCompile Include="RGBColor.cpp" />

@@ -19,11 +19,14 @@ public:
 	void addZoom(int x, int y, double scale);
 	void addColorRange(double rangeInterval, RGBColor endColor);
 	void writeBitmap(std::string name);
-	void printColorRangePixelCounts();
+	void calculateColorRangePixelCounts();
 private:
 	void sanitizeColorInputs();
 	void normalizeColorIntervals();
 	void enforceColorGradient();
+	int getRangeMaximumIterations(int rangeIndex) const;
+	int getRangeMinimumIterations(int rangeIndex) const;
+	int getRangeIndex(int iterations) const;
 	Bitmap m_bitmap;
 	ZoomList m_zoomlist; 
 	std::unique_ptr<int[]> m_iterationHistogram;
